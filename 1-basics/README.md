@@ -1,10 +1,21 @@
 # GYM 환경별로 state가 무엇인지, action은 무엇인지, 기본적인 내용에 대해서 공부
 
-# Classic Control : Cartpole-v?
+https://github.com/openai/gym/wiki/Table-of-environments
+
+## Classic Control : Cartpole-v?
 
 haha
 
-# MuJoCo : Walker2d-v?
+## Pendulum
+
+* state
+  * cos(theta), sin(theta), theta dot
+  * https://github.com/openai/gym/wiki/Pendulum-v0
+* action
+  * joint effect
+  * https://github.com/openai/gym/wiki/Pendulum-v0
+
+## MuJoCo : Walker2d-v?
 
 * state
 	* 위치, 속도 정보가 들어가는 듯?
