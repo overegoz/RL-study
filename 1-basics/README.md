@@ -39,7 +39,7 @@ def _get_obs(self):
 </actuator>
 ```	
 * reward
-	* forward_reward + healthy_reward - costs 로 계산하네
+	* `forward_reward + healthy_reward - costs` 로 계산하네
 	* https://github.com/openai/gym/blob/master/gym/envs/mujoco/walker2d_v3.py
 ```
 def step(self, action):
