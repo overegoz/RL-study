@@ -1,9 +1,33 @@
-# https://gym.openai.com/envs/CartPole-v1/
-# https://github.com/openai/gym/blob/master/gym/envs/classic_control/cartpole.py
+import gym
+import time
 
-# pip install gym
+env = gym.make("Walker2d-v2")
+# env = env.unwrapped
+# end.seed(1)
 
-# install mujoco-py
-# https://github.com/openai/mujoco-py
-# https://seunghyun-lee.tistory.com/2
+RENDER_ENV = True
+NUM_EPISODES = 100
+
+"""
+Something to know about the Walker2d-v2 environment:
+- state
+  . state.shape = (17,0)
+  . state.shape[0] = 17 // 17 items in each state
+- action
+  . action.shape = (6,0)
+  . action.shape[0] = 6 // 6 items in each action
+"""
+
+if __name__ == "__main__":
+    for i in range(NUM_EPISODES):
+        state = env.reset()  # initialize the env, and get the observation
+        done = False
+        while not done: 
+            if RENDER_ENV: env.render()
+
+            # choo a random action
+            action = env.action_space.sample()
+
+            # apply the action, and then get (state, reward, done-flag)
+            state, reward, done, _ = env.step(action)
 

@@ -1,4 +1,4 @@
-# 환경별로 state가 무엇인지, action은 무엇인지를 정리
+# GYM 환경별로 state가 무엇인지, action은 무엇인지, 기본적인 내용에 대해서 공부
 
 # Classic Control : Cartpole-v?
 
