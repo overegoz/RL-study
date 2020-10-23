@@ -20,7 +20,12 @@
   * 압축해제 후, c:/Users/[본인계정]/.mujoco/mujoco200 경로에 파일을 저장 (리눅스라면 `~/.mujoco/mujoco200`)
   * act-key 파일 'mjkey.txt'을 .mujoco, .mujoco/mujoco200, .mujoco/mujoco200/bin 에 저장
   * 설치 확인 : C:\Users\[본인계정]\.mujoco\mjoco200\bin> 경로에서 simulate ../model/humanoid.xml를 실행해서, humanoid가 나오는지 확인
-  * 환경변수 설정: bin 디렉토리를 PATH 환경변수에 저장
+  * 환경변수 설정: 
+    * bin 디렉토리를 PATH 환경변수에 저장
+    * MUJOCO_HOME=C:\Users\hallym\.mujoco
+    * MUJOCO_LICENSE_PATH=C:\Users\hallym\.mujoco
+    * MUJOCO_PY_MJKEY_PATH=C:\Users\hallym\.mujoco\mjkey.txt
+    * MUJOCO_PY_MUJOCO_PATH=C:\Users\hallym\.mujoco\mujoco200
   * MuJoCo-py 설치 : `pip3 install -U 'mujoco-py<2.1,>=2.0'`
 * 설치파일 : https://www.roboti.us/index.html
 * 설치확인 : 
