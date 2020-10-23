@@ -11,6 +11,17 @@
 * 설치방법 : https://github.com/openai/mujoco-py
 * 설치방법 : https://seunghyun-lee.tistory.com/2
   * 근데, https://www.roboti.us/index.html 가니까 mujoco200 win64가 있는데?
+* 설치방법 (Win10, MuJoCo-200)
+  * https://www.roboti.us/license.html 에서 학생용 라이선스 신청 (학교 이메일 계정 사용)
+  * 24시간 내에 `MuJoCo Pro Personal Account` 라는 이메일을 받는데, 그 안에 account number가 text로 적혀있음
+  * https://www.roboti.us/license.html 페이지에서 https://www.roboti.us/getid/getid_win64.exe 파일을 다운 받아서 실행하면 computer id를 알려줌
+  * https://www.roboti.us/license.html 페이지에서 account number랑 computer id를 입력하면 activation key에 해당하는 txt 파일을 이메일로 받음
+  * mujoco 파일을 다운로드 : https://www.roboti.us/index.html (설치하는 건 없고, 압출만 풀면 됨)
+  * 압축해제 후, c:/Users/[본인계정]/.mujoco/mujoco200 경로에 파일을 저장 (리눅스라면 `~/.mujoco/mujoco200`)
+  * act-key 파일 'mjkey.txt'을 .mujoco, .mujoco/mujoco200, .mujoco/mujoco200/bin 에 저장
+  * 설치 확인 : C:\Users\[본인계정]\.mujoco\mjoco200\bin> 경로에서 simulate ../model/humanoid.xml를 실행해서, humanoid가 나오는지 확인
+  * 환경변수 설정: bin 디렉토리를 PATH 환경변수에 저장
+  * MuJoCo-py 설치 : `pip3 install -U 'mujoco-py<2.1,>=2.0'`
 * 설치파일 : https://www.roboti.us/index.html
 * 설치확인 : 
 ```
