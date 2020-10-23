@@ -18,9 +18,10 @@ class DDPGagent(object):
 
         ## hyperparameters
         self.GAMMA = 0.95
-        self.BATCH_SIZE = 64
+        self.BATCH_SIZE = 128
         self.BUFFER_SIZE = 20000
-        self.ACTOR_LEARNING_RATE = 0.0001
+        self.MIN_SAMPLES_TO_BEGIN_LEARNING = 500
+        self.ACTOR_LEARNING_RATE = 0.001
         self.CRITIC_LEARNING_RATE = 0.001
         self.TAU = 0.001
 
@@ -89,7 +90,8 @@ class DDPGagent(object):
                 train_reward = (reward + 8) / 8
                 self.buffer.add_buffer(state, action, train_reward, next_state, done)
 
-                if self.buffer.buffer_size > 1000:  # start train after buffer has some amounts
+                # start train after buffer has some amounts
+                if self.buffer.buffer_size > self.MIN_SAMPLES_TO_BEGIN_LEARNING:  
 
                     # sample transitions from replay buffer
                     states, actions, rewards, next_states, dones = self.buffer.sample_batch(self.BATCH_SIZE)
