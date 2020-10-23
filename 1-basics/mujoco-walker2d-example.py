@@ -6,7 +6,7 @@ env = gym.make("Walker2d-v2")
 # end.seed(1)
 
 RENDER_ENV = True
-NUM_EPISODES = 100
+NUM_EPISODES = 10
 
 """
 Something to know about the Walker2d-v2 environment:
@@ -27,7 +27,9 @@ if __name__ == "__main__":
 
             # choo a random action
             action = env.action_space.sample()
+            print('action: ', action)
 
             # apply the action, and then get (state, reward, done-flag)
             state, reward, done, _ = env.step(action)
+            print('state: ', state)
 

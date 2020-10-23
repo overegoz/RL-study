@@ -5,7 +5,7 @@ from ddpg_agent import DDPGagent
 
 def main():
 
-    max_episode_num = 200
+    max_episode_num = 300
     env = gym.make("Walker2d-v2")
     agent = DDPGagent(env)
 

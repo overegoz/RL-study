@@ -37,7 +37,7 @@ class Critic(object):
         x2 = Dense(32, activation='linear')(x1)
         #a1 = Dense(1, activation='linear')(action_input)
         a1 = Dense(32, activation='relu')(action_input)
-        a2 = Dense(32, activation='linear')(a1)
+        a2 = Dense(16, activation='linear')(a1)
         h2 = concatenate([x2, a2], axis=-1)
         #h2 = Add()([x2, a1])
         h3 = Dense(16, activation='relu')(h2)
