@@ -23,6 +23,7 @@ def main():
         print('Time: ', time, 'Reward: ', reward)
 
         if done:
+            print('This episode is over (lasted for %d seconds)\n' % time)
             break
 
     env.close()
