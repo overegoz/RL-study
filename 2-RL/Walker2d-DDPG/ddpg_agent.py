@@ -20,7 +20,7 @@ class DDPGagent(object):
         self.GAMMA = 0.95
         self.BATCH_SIZE = 128
         self.BUFFER_SIZE = 20000
-        self.MIN_SAMPLES_TO_BEGIN_LEARNING = 500
+        self.MIN_SAMPLES_TO_BEGIN_LEARNING = 1000
         self.ACTOR_LEARNING_RATE = 0.001
         self.CRITIC_LEARNING_RATE = 0.001
         self.TAU = 0.001
