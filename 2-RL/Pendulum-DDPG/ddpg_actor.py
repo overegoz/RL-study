@@ -77,4 +77,4 @@ class Actor(object):
 
     ## load actor wieghts
     def load_weights(self, path):
-        self.model.load_weights(path + 'pendulum_actor.h5')
+        self.model.load_weights(path + 'actor.h5')

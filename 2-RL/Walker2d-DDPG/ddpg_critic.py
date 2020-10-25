@@ -32,16 +32,21 @@ class Critic(object):
     ## critic network
     def build_network(self):
         state_input = Input((self.state_dim,))
+        x1 = Dense(256, activation='relu')(state_input)
+        x2 = Dense(128, activation='linear')(x1)
+        x3 = Dense(64, activation='linear')(x2)
+
         action_input = Input((self.action_dim,))
-        x1 = Dense(64, activation='relu')(state_input)
-        x2 = Dense(32, activation='linear')(x1)
-        #a1 = Dense(1, activation='linear')(action_input)
-        a1 = Dense(32, activation='relu')(action_input)
-        a2 = Dense(16, activation='linear')(a1)
-        h2 = concatenate([x2, a2], axis=-1)
-        #h2 = Add()([x2, a1])
-        h3 = Dense(16, activation='relu')(h2)
-        q_output = Dense(1, activation='linear')(h3)
+        a1 = Dense(128, activation='relu')(action_input)
+        a2 = Dense(64, activation='linear')(a1)
+
+        h2 = concatenate([x3, a2], axis=-1)  # h2 = Add()([x2, a1])
+        h3 = Dense(64, activation='relu')(h2)
+        h4 = Dense(16, activation='relu')(h3)
+
+        # final output layer
+        q_output = Dense(1, activation='linear')(h4)
+
         model = Model([state_input, action_input], q_output)
         model.summary()
         return model, state_input, action_input
@@ -79,4 +84,4 @@ class Critic(object):
 
     ## load critic wieghts
     def load_weights(self, path):
-        self.model.load_weights(path + 'pendulum_critic.h5')
+        self.model.load_weights(path + 'critic.h5')

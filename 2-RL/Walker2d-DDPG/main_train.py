@@ -5,14 +5,13 @@ from ddpg_agent import DDPGagent
 
 def main():
 
-    max_episode_num = 1000
+    max_episode_num = 3000
     env = gym.make("Walker2d-v2")
     agent = DDPGagent(env)
 
     agent.train(max_episode_num)
 
     agent.plot_result()
-
 
 
 if __name__=="__main__":

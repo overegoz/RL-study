@@ -16,26 +16,31 @@ class DDPGagent(object):
         self.sess = tf.Session()
         K.set_session(self.sess)
 
+        self.SAVE_FREQ = 100 # save for 100 epi
+
         ## hyperparameters
         self.GAMMA = 0.95
         self.BATCH_SIZE = 128
         self.BUFFER_SIZE = 20000
-        self.MIN_SAMPLES_TO_BEGIN_LEARNING = 1000
-        self.ACTOR_LEARNING_RATE = 0.001
+        self.MIN_SAMPLES_TO_BEGIN_LEARNING = self.BATCH_SIZE * 10
+        self.ACTOR_LEARNING_RATE = 0.0001
         self.CRITIC_LEARNING_RATE = 0.001
         self.TAU = 0.001
 
         self.env = env
         # get state dimension
         self.state_dim = env.observation_space.shape[0]
+        print('state_dim: ', self.state_dim)
         # get action dimension
         self.action_dim = env.action_space.shape[0]
+        print('action_dim: ', self.action_dim)
         # get action bound
-        self.action_bound = env.action_space.high[0]
+        self.action_bound = env.action_space.high
+        print('action_bound: ', self.action_bound)
 
         ## create actor and critic networks
         self.actor = Actor(self.sess, self.state_dim,
-                           self.action_dim, self.action_bound, self.TAU, self.ACTOR_LEARNING_RATE)
+                           self.action_dim, self.action_bound[0], self.TAU, self.ACTOR_LEARNING_RATE)
         self.critic = Critic(self.sess, self.state_dim, self.action_dim, self.TAU, self.CRITIC_LEARNING_RATE)
 
         ## initialize for later gradient calculation
@@ -92,6 +97,7 @@ class DDPGagent(object):
 
                 # start train after buffer has some amounts
                 if self.buffer.buffer_size > self.MIN_SAMPLES_TO_BEGIN_LEARNING:  
+                    #print('train...in prog')
 
                     # sample transitions from replay buffer
                     states, actions, rewards, next_states, dones = self.buffer.sample_batch(self.BATCH_SIZE)
@@ -125,13 +131,13 @@ class DDPGagent(object):
 
             self.save_epi_reward.append(episode_reward)
 
+            ## save weights for 100 epi
+            if (ep > 0) and (ep % 100 == 0):
+                #print('Now save')
+                self.actor.save_weights("./save_weights/actor-" + str(ep) + ".h5")
+                self.critic.save_weights("./save_weights/critic-" + str(ep) + ".h5")
 
-            ## save weights every episode
-            #print('Now save')
-            self.actor.save_weights("./save_weights/pendulum_actor.h5")
-            self.critic.save_weights("./save_weights/pendulum_critic.h5")
-
-        np.savetxt('./save_weights/pendulum_epi_reward.txt', self.save_epi_reward)
+        np.savetxt('./save_weights/epi_reward.txt', self.save_epi_reward)
         print(self.save_epi_reward)
 
 

@@ -126,10 +126,10 @@ class DDPGagent(object):
 
             ## save weights every episode
             #print('Now save')
-            self.actor.save_weights("./save_weights/pendulum_actor.h5")
-            self.critic.save_weights("./save_weights/pendulum_critic.h5")
+            self.actor.save_weights("./save_weights/actor.h5")
+            self.critic.save_weights("./save_weights/critic.h5")
 
-        np.savetxt('./save_weights/pendulum_epi_reward.txt', self.save_epi_reward)
+        np.savetxt('./save_weights/epi_reward.txt', self.save_epi_reward)
         print(self.save_epi_reward)
 
 

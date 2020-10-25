@@ -31,10 +31,11 @@ class Actor(object):
     ## actor network
     def build_network(self):
         state_input = Input((self.state_dim,))
-        h1 = Dense(64, activation='relu')(state_input)
-        h2 = Dense(32, activation='relu')(h1)
-        h3 = Dense(16, activation='relu')(h2)
-        out = Dense(self.action_dim, activation='tanh')(h3)
+        h1 = Dense(512, activation='relu')(state_input)
+        h2 = Dense(256, activation='relu')(h1)
+        h3 = Dense(128, activation='relu')(h2)
+        h4 = Dense(64, activation='relu')(h3)
+        out = Dense(self.action_dim, activation='tanh')(h4)
 
         # Scale output to [-action_bound, action_bound]
         action_output = Lambda(lambda x: x*self.action_bound)(out)
@@ -77,4 +78,4 @@ class Actor(object):
 
     ## load actor wieghts
     def load_weights(self, path):
-        self.model.load_weights(path + 'pendulum_actor.h5')
+        self.model.load_weights(path + 'actor.h5')

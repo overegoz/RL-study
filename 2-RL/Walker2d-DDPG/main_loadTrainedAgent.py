@@ -22,8 +22,8 @@ def main():
 
         print('Time: ', time, 'Reward: ', reward)
 
-        if done:
-            break
+        #if done: break
+        if done: state = env.reset()
 
     env.close()
 
