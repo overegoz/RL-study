@@ -4,6 +4,8 @@ from keras.models import Model
 from keras.layers import Dense, Input, concatenate
 from keras.optimizers import Adam
 from keras import regularizers
+from tensorflow.keras import initializers
+from keras.layers import BatchNormalization
 
 import tensorflow as tf
 
@@ -33,20 +35,42 @@ class Critic(object):
     ## critic network
     def build_network(self):
         state_input = Input((self.state_dim,))
-        x1 = Dense(256, activation='relu')(state_input)
-        x2 = Dense(128, activation='relu')(x1)
-        x3 = Dense(64, activation='relu')(x2)
+        state_input_bn = BatchNormalization()(state_input)
+        x1 = Dense(256, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(state_input_bn)   
+        x2 = Dense(128, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(x1)
+        x3 = Dense(64, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(x2)
 
         action_input = Input((self.action_dim,))
-        a1 = Dense(128, activation='relu')(action_input)
-        a2 = Dense(64, activation='relu')(a1)
+        # action은 이미 [-1, 1] 사이의 값을 가지고 있으니까, batch normalization을 따로 하지 않아도 될듯
+        # 참고:  배치 정규화는 인공신경망에 입력값을 평균 0, 분산 1로 정규화(normalize)
+        # from https://buomsoo-kim.github.io/keras/2018/04/24/Easy-deep-learning-with-Keras-5.md/
+        #action_input_bn = BatchNormalization()(action_input)
+        a1 = Dense(128, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(action_input)
+        a2 = Dense(64, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(a1)
 
-        h2 = concatenate([x3, a2], axis=-1)  # h2 = Add()([x2, a1])
-        h3 = Dense(64, activation='relu')(h2)
-        h4 = Dense(16, activation='relu')(h3)
-
+        h1 = concatenate([x3, a2], axis=-1)  # h2 = Add()([x2, a1])
+        h2 = BatchNormalization()(h1)
+        h3 = Dense(64, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(h2)
+        h4 = Dense(16, activation='relu', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                    bias_initializer=initializers.Zeros())(h3)
+        h4_bn = BatchNormalization()(h4)
         # final output layer
-        q_output = Dense(1, activation='linear')(h4)
+        q_output = Dense(1, activation='linear', \
+                        kernel_initializer=initializers.RandomNormal(stddev=0.5), \
+                        bias_initializer=initializers.Zeros())(h4_bn)
 
         model = Model([state_input, action_input], q_output)
         model.summary()

@@ -18,19 +18,26 @@ class DDPGagent(object):
         K.set_session(self.sess)
 
         self.SAVE_FREQ = 100 # save for 100 epi
-        self.train_rate = 0.3 
-        self.target_network_update_rate = 0.3
-        self.noise_add_rate = 0.3
+        # 타겟 신경망을 일정 확률로 업데이트 해서, 학습 안정성을 높임
+        self.target_network_update_rate = 0.5
+        _ = input('Target network update rate is set to 0.3 : [ENTER]')
+        # 노이즈를 추가하면 exploration이 되는데, 지금 학습하려는 control문제는
+        # 그 자체로 워낙 복잡해서 노이즈가 없어도 될듯...?
+        self.noise_add_rate = 0.0
+        _ = input('Noise add rate is set to 0 : [ENTER]')
 
         ## hyperparameters
-        self.GAMMA = 0.95  # discount factor (감가율)
+        #self.GAMMA = 0.95  # 보상에 적용될 discount factor (감가율)
+        self.GAMMA = 0.99  # 보상에 적용될 discount factor (감가율)
         self.BATCH_SIZE = 128  # 한번 학습할때 몇개의 샘플을 사용할지
-        self.BUFFER_SIZE = 30000  # 샘플을 버퍼에 넣고, 그 중에서 무작위로 골라서 학습함
+        #self.BUFFER_SIZE = 30000  # 샘플을 저장할 버퍼의 크기. 샘플을 버퍼에 넣고, 그 중에서 무작위로 골라서 학습함
+        self.BUFFER_SIZE = 10000  # 샘플을 저장할 버퍼의 크기. 샘플을 버퍼에 넣고, 그 중에서 무작위로 골라서 학습함
         self.MIN_SAMPLES_TO_BEGIN_LEARNING = self.BATCH_SIZE * 10  # 학습 시작을 위해 필요한 최소 샘플 수
-        self.ACTOR_LEARNING_RATE = 0.001  # 액터(정책)의 학습률
+        self.ACTOR_LEARNING_RATE = 0.0001  # 액터(정책)의 학습률
+        #self.ACTOR_LEARNING_RATE = 0.001  # 액터(정책)의 학습률
         self.CRITIC_LEARNING_RATE = 0.001  # 크리틱(Q함수)의 학습률
-        # self.TAU = 0.001
-        self.TAU = 0.01  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
+        #self.TAU = 0.01  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
+        self.TAU = 0.001  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
 
         self.env = env
         # get state dimension
@@ -44,7 +51,7 @@ class DDPGagent(object):
         print('action_bound: ', self.action_bound)
 
         ## create actor and critic networks
-        self.actor = Actor(self.sess, self.state_dim,
+        self.actor = Actor(self.sess, self.state_dim, \
                            self.action_dim, self.action_bound[0], self.TAU, self.ACTOR_LEARNING_RATE)
         self.critic = Critic(self.sess, self.state_dim, self.action_dim, self.TAU, self.CRITIC_LEARNING_RATE)
 
@@ -66,10 +73,8 @@ class DDPGagent(object):
     def td_target(self, rewards, q_values, dones):
         y_k = np.asarray(q_values)
         for i in range(q_values.shape[0]): # number of batch
-            if dones[i]:
-                y_k[i] = rewards[i]
-            else:
-                y_k[i] = rewards[i] + self.GAMMA * q_values[i]
+            if dones[i]: y_k[i] = rewards[i]
+            else: y_k[i] = rewards[i] + self.GAMMA * q_values[i]
         return y_k
 
 
@@ -87,14 +92,16 @@ class DDPGagent(object):
             time, episode_reward, done = 0, 0, False
             # reset the environment and observe the first state
             state = self.env.reset()
+
             while not done:
                 # visualize the environment
                 #self.env.render()
                 # pick an action: shape = (1,)
                 action = self.actor.predict(state)
+                #print('action: ', action)
                 noise = self.ou_noise(pre_noise, dim=self.action_dim)  # 노이즈가 너무 커서, 약간 줄였음...
 
-                if random.random() > self.noise_add_rate:  # 일정 확률로 노이즈를 추가
+                if random.random() < self.noise_add_rate:  # 일정 확률로 노이즈를 추가
                     # clip continuous action to be within action_bound
                     #print('before: ', action)
                     action = np.clip(action + noise, -self.action_bound, self.action_bound)
@@ -102,8 +109,10 @@ class DDPGagent(object):
 
                 # observe reward, new_state
                 next_state, reward, done, _ = self.env.step(action)
+                #print('reward: ', reward)
                 # add transition to replay buffer
-                train_reward = (reward + 8) / 8
+                #train_reward = (reward + 8) / 8  # 책에서 사용하는 공식인데, walker2d에선 필요 없음
+                train_reward = reward
                 self.buffer.add_buffer(state, action, train_reward, next_state, done)
 
                 # start train after buffer has some amounts
@@ -130,7 +139,7 @@ class DDPGagent(object):
                     # update both target network
                     # 일정 확률로 target network를 업데이트
                     # 학습 안정성을 높이기 위해...
-                    if random.random() > self.target_network_update_rate:  
+                    if random.random() < self.target_network_update_rate:  
                         self.actor.update_target_network()
                         self.critic.update_target_network()
 
