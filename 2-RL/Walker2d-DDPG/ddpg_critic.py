@@ -3,6 +3,7 @@
 from keras.models import Model
 from keras.layers import Dense, Input, concatenate
 from keras.optimizers import Adam
+from keras import regularizers
 
 import tensorflow as tf
 
@@ -33,7 +34,7 @@ class Critic(object):
     def build_network(self):
         state_input = Input((self.state_dim,))
         x1 = Dense(256, activation='relu')(state_input)
-        x2 = Dense(128, activation='linear')(x1)
+        x2 = Dense(128, activation='relu')(x1)
         x3 = Dense(64, activation='linear')(x2)
 
         action_input = Input((self.action_dim,))

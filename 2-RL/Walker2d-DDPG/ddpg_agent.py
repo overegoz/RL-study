@@ -4,6 +4,7 @@ import numpy as np
 import tensorflow as tf
 import keras.backend as K
 import matplotlib.pyplot as plt
+import random
 
 from ddpg_actor import Actor
 from ddpg_critic import Critic
@@ -11,21 +12,22 @@ from replaybuffer import ReplayBuffer
 
 class DDPGagent(object):
 
-    def __init__(self, env):
+    def __init__(self, env, do_train):
 
         self.sess = tf.Session()
         K.set_session(self.sess)
 
         self.SAVE_FREQ = 100 # save for 100 epi
+        self.do_train = do_train
 
         ## hyperparameters
-        self.GAMMA = 0.95
+        self.GAMMA = 0.95  # discount factor (감가율)
         self.BATCH_SIZE = 128
-        self.BUFFER_SIZE = 20000
-        self.MIN_SAMPLES_TO_BEGIN_LEARNING = self.BATCH_SIZE * 10
-        self.ACTOR_LEARNING_RATE = 0.0001
+        self.BUFFER_SIZE = 30000
+        self.MIN_SAMPLES_TO_BEGIN_LEARNING = self.BATCH_SIZE * 10  # 학습 시작을 위해 필요한 최소 샘플 수
+        self.ACTOR_LEARNING_RATE = 0.001
         self.CRITIC_LEARNING_RATE = 0.001
-        self.TAU = 0.001
+        self.TAU = 0.001  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
 
         self.env = env
         # get state dimension
@@ -86,9 +88,11 @@ class DDPGagent(object):
                 #self.env.render()
                 # pick an action: shape = (1,)
                 action = self.actor.predict(state)
-                noise = self.ou_noise(pre_noise, dim=self.action_dim)
-                # clip continuous action to be within action_bound
-                action = np.clip(action + noise, -self.action_bound, self.action_bound)
+                if self.do_train and random.random() > 0.5:
+                    noise = self.ou_noise(pre_noise, dim=self.action_dim)
+                    # clip continuous action to be within action_bound
+                    action = np.clip(action + noise, -self.action_bound, self.action_bound)
+
                 # observe reward, new_state
                 next_state, reward, done, _ = self.env.step(action)
                 # add transition to replay buffer

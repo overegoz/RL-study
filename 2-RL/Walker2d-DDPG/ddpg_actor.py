@@ -4,6 +4,7 @@ import numpy as np
 
 from keras.models import Model
 from keras.layers import Dense, Input, Lambda
+from keras import regularizers
 
 import tensorflow as tf
 
@@ -35,7 +36,8 @@ class Actor(object):
         h2 = Dense(256, activation='relu')(h1)
         h3 = Dense(128, activation='relu')(h2)
         h4 = Dense(64, activation='relu')(h3)
-        out = Dense(self.action_dim, activation='tanh')(h4)
+        h5 = Dense(32, activation='relu')(h4)
+        out = Dense(self.action_dim, activation='tanh')(h5)
 
         # Scale output to [-action_bound, action_bound]
         action_output = Lambda(lambda x: x*self.action_bound)(out)
