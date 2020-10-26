@@ -6,7 +6,7 @@ from ddpg_agent import DDPGagent
 def main():
 
     env = gym.make("Walker2d-v2")
-    agent = DDPGagent(env, do_train=False)
+    agent = DDPGagent(env)
 
     agent.actor.load_weights('./save_weights/')
     agent.critic.load_weights('./save_weights/')

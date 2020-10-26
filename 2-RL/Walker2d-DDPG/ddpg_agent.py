@@ -12,21 +12,21 @@ from replaybuffer import ReplayBuffer
 
 class DDPGagent(object):
 
-    def __init__(self, env, do_train):
+    def __init__(self, env):
 
         self.sess = tf.Session()
         K.set_session(self.sess)
 
         self.SAVE_FREQ = 100 # save for 100 epi
-        self.do_train = do_train
+        self.train_rate = 0.5 
 
         ## hyperparameters
         self.GAMMA = 0.95  # discount factor (감가율)
-        self.BATCH_SIZE = 128
-        self.BUFFER_SIZE = 30000
+        self.BATCH_SIZE = 128  # 한번 학습할때 몇개의 샘플을 사용할지
+        self.BUFFER_SIZE = 30000  # 샘플을 버퍼에 넣고, 그 중에서 무작위로 골라서 학습함
         self.MIN_SAMPLES_TO_BEGIN_LEARNING = self.BATCH_SIZE * 10  # 학습 시작을 위해 필요한 최소 샘플 수
-        self.ACTOR_LEARNING_RATE = 0.001
-        self.CRITIC_LEARNING_RATE = 0.001
+        self.ACTOR_LEARNING_RATE = 0.001  # 액터(정책)의 학습률
+        self.CRITIC_LEARNING_RATE = 0.001  # 크리틱(Q함수)의 학습률
         self.TAU = 0.001  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
 
         self.env = env
@@ -88,7 +88,7 @@ class DDPGagent(object):
                 #self.env.render()
                 # pick an action: shape = (1,)
                 action = self.actor.predict(state)
-                if self.do_train and random.random() > 0.5:
+                if random.random() > self.train_rate:
                     noise = self.ou_noise(pre_noise, dim=self.action_dim)
                     # clip continuous action to be within action_bound
                     action = np.clip(action + noise, -self.action_bound, self.action_bound)
@@ -100,7 +100,7 @@ class DDPGagent(object):
                 self.buffer.add_buffer(state, action, train_reward, next_state, done)
 
                 # start train after buffer has some amounts
-                if self.buffer.buffer_size > self.MIN_SAMPLES_TO_BEGIN_LEARNING:  
+                if self.buffer.get_buffer_size() > self.MIN_SAMPLES_TO_BEGIN_LEARNING:  
                     #print('train...in prog')
 
                     # sample transitions from replay buffer
@@ -123,6 +123,7 @@ class DDPGagent(object):
                     # update both target network
                     self.actor.update_target_network()
                     self.critic.update_target_network()
+
 
                 # update current state
                 pre_noise = noise

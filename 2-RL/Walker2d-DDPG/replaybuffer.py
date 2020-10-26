@@ -29,6 +29,7 @@ class ReplayBuffer(object):
             batch = random.sample(self.buffer, self.count)
         else:
             batch = random.sample(self.buffer, batch_size)
+
         # return a batch of transitions
         states = np.asarray([i[0] for i in batch])
         actions = np.asarray([i[1] for i in batch])
@@ -39,7 +40,7 @@ class ReplayBuffer(object):
 
 
     ## Current buffer occupation
-    def buffer_size(self):
+    def get_buffer_size(self):
         return self.count
 
     ## Clear buffer

@@ -7,7 +7,7 @@ def main():
 
     max_episode_num = 3000
     env = gym.make("Walker2d-v2")
-    agent = DDPGagent(env, do_train=True)
+    agent = DDPGagent(env)
 
     agent.train(max_episode_num+1)
 
