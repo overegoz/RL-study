@@ -19,6 +19,8 @@ class DDPGagent(object):
 
         self.SAVE_FREQ = 100 # save for 100 epi
         self.train_rate = 0.3 
+        self.target_network_update_rate = 0.3
+        self.noise_add_rate = 0.3
 
         ## hyperparameters
         self.GAMMA = 0.95  # discount factor (감가율)
@@ -90,9 +92,9 @@ class DDPGagent(object):
                 #self.env.render()
                 # pick an action: shape = (1,)
                 action = self.actor.predict(state)
-                noise = self.ou_noise(pre_noise, dim=self.action_dim)
+                noise = self.ou_noise(pre_noise, dim=self.action_dim)  # 노이즈가 너무 커서, 약간 줄였음...
 
-                if random.random() > self.train_rate:  # 일정 확률로 노이즈를 추가
+                if random.random() > self.noise_add_rate:  # 일정 확률로 노이즈를 추가
                     # clip continuous action to be within action_bound
                     #print('before: ', action)
                     action = np.clip(action + noise, -self.action_bound, self.action_bound)
@@ -126,8 +128,11 @@ class DDPGagent(object):
                     # train actor
                     self.actor.train(states, dq_das)
                     # update both target network
-                    self.actor.update_target_network()
-                    self.critic.update_target_network()
+                    # 일정 확률로 target network를 업데이트
+                    # 학습 안정성을 높이기 위해...
+                    if random.random() > self.target_network_update_rate:  
+                        self.actor.update_target_network()
+                        self.critic.update_target_network()
 
 
                 # update current state
