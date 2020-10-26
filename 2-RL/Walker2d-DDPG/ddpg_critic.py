@@ -35,11 +35,11 @@ class Critic(object):
         state_input = Input((self.state_dim,))
         x1 = Dense(256, activation='relu')(state_input)
         x2 = Dense(128, activation='relu')(x1)
-        x3 = Dense(64, activation='linear')(x2)
+        x3 = Dense(64, activation='relu')(x2)
 
         action_input = Input((self.action_dim,))
         a1 = Dense(128, activation='relu')(action_input)
-        a2 = Dense(64, activation='linear')(a1)
+        a2 = Dense(64, activation='relu')(a1)
 
         h2 = concatenate([x3, a2], axis=-1)  # h2 = Add()([x2, a1])
         h3 = Dense(64, activation='relu')(h2)

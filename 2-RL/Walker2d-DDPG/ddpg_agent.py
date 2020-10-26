@@ -18,7 +18,7 @@ class DDPGagent(object):
         K.set_session(self.sess)
 
         self.SAVE_FREQ = 100 # save for 100 epi
-        self.train_rate = 0.5 
+        self.train_rate = 0.3 
 
         ## hyperparameters
         self.GAMMA = 0.95  # discount factor (감가율)
@@ -27,7 +27,8 @@ class DDPGagent(object):
         self.MIN_SAMPLES_TO_BEGIN_LEARNING = self.BATCH_SIZE * 10  # 학습 시작을 위해 필요한 최소 샘플 수
         self.ACTOR_LEARNING_RATE = 0.001  # 액터(정책)의 학습률
         self.CRITIC_LEARNING_RATE = 0.001  # 크리틱(Q함수)의 학습률
-        self.TAU = 0.001  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
+        # self.TAU = 0.001
+        self.TAU = 0.01  # 신경망 업데이트 정도 (매 timestep마다 target 신경망을 조금씩 업데이트)
 
         self.env = env
         # get state dimension
@@ -55,7 +56,8 @@ class DDPGagent(object):
         self.save_epi_reward = []
 
     ## Ornstein Uhlenbeck Noise
-    def ou_noise(self, x, rho=0.15, mu=0, dt=1e-1, sigma=0.2, dim=1):
+    #def ou_noise(self, x, rho=0.15, mu=0, dt=1e-1, sigma=0.2, dim=1):  # 오류가 너무 큰거 아닌가..
+    def ou_noise(self, x, rho=0.015, mu=0, dt=1e-1, sigma=0.02, dim=1):
         return x + rho*(mu - x)*dt + sigma*np.sqrt(dt)*np.random.normal(size=dim)
 
     ## computing TD target: y_k = r_k + gamma*Q(s_k+1, a_k+1)
@@ -88,10 +90,13 @@ class DDPGagent(object):
                 #self.env.render()
                 # pick an action: shape = (1,)
                 action = self.actor.predict(state)
-                if random.random() > self.train_rate:
-                    noise = self.ou_noise(pre_noise, dim=self.action_dim)
+                noise = self.ou_noise(pre_noise, dim=self.action_dim)
+
+                if random.random() > self.train_rate:  # 일정 확률로 노이즈를 추가
                     # clip continuous action to be within action_bound
+                    #print('before: ', action)
                     action = np.clip(action + noise, -self.action_bound, self.action_bound)
+                    #print('after: ', action)
 
                 # observe reward, new_state
                 next_state, reward, done, _ = self.env.step(action)
