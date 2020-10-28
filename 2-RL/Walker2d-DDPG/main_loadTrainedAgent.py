@@ -16,7 +16,10 @@ def main():
 
     while True:
         env.render()
+
         action = agent.actor.predict(state)
+        print(action)
+
         state, reward, done, _ = env.step(action)
         time += 1
 

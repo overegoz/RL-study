@@ -15,6 +15,13 @@ class ReplayBuffer(object):
     def add_buffer(self, state, action, reward, next_state, done):
         transition = (state, action, reward, next_state, done)
 
+        """
+        ** deque **
+        append() :- This function is used to insert the value in its argument to the right end of deque.
+        appendleft() :- This function is used to insert the value in its argument to the left end of deque.
+        pop() :- This function is used to delete an argument from the right end of deque.
+        popleft() :- This function is used to delete an argument from the left end of deque.
+        """
         # check if buffer is full
         if self.count < self.buffer_size:
             self.buffer.append(transition)
@@ -36,6 +43,7 @@ class ReplayBuffer(object):
         rewards = np.asarray([i[2] for i in batch])
         next_states = np.asarray([i[3] for i in batch])
         dones = np.asarray([i[4] for i in batch])
+        
         return states, actions, rewards, next_states, dones
 
 

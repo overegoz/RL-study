@@ -5,8 +5,12 @@ import numpy as np
 from keras.models import Model
 from keras.layers import Dense, Input, Lambda
 from keras import regularizers
+from tensorflow.keras import initializers
+from keras.layers import BatchNormalization
+from tensorflow.keras import activations
 
 import tensorflow as tf
+
 
 class Actor(object):
     """
@@ -32,12 +36,25 @@ class Actor(object):
     ## actor network
     def build_network(self):
         state_input = Input((self.state_dim,))
-        h1 = Dense(512, activation='relu')(state_input)
-        h2 = Dense(256, activation='relu')(h1)
-        h3 = Dense(128, activation='relu')(h2)
-        h4 = Dense(64, activation='relu')(h3)
-        h5 = Dense(32, activation='relu')(h4)
-        out = Dense(self.action_dim, activation='tanh')(h5)
+        state_input_bn = BatchNormalization()(state_input)
+        
+        h1 = Dense(512, activation='tanh', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.25), \
+                    bias_initializer=initializers.Zeros())(state_input_bn)
+        #h2 = Dense(256, activation='relu')(h1)
+        #h3 = Dense(128, activation='relu')(h2)
+        h3 = Dense(256, activation='tanh', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.25), \
+                    bias_initializer=initializers.Zeros())(h1)
+        #h4 = Dense(64, activation='relu')(h3)
+        #h5 = Dense(32, activation='relu')(h4)
+        h5 = Dense(64, activation='tanh', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.25), \
+                    bias_initializer=initializers.Zeros())(h3)
+        h5_bn = BatchNormalization()(h5)            
+        out = Dense(self.action_dim, activation='tanh', \
+                    kernel_initializer=initializers.RandomNormal(stddev=0.25), \
+                    bias_initializer=initializers.Zeros())(h5_bn)
 
         # Scale output to [-action_bound, action_bound]
         action_output = Lambda(lambda x: x*self.action_bound)(out)
